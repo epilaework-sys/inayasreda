@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ИНАЯ СРЕДА — итоговая 5.0</title>
+  <style>
+    :root {
+      --bg: #1c1917;
+      --panel: #292524;
+      --ink: #fafaf9;
+      --muted: #a8a29e;
+      --accent: #c4a574;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font-family: "Helvetica Neue", Arial, sans-serif; }
+    .app { display: grid; grid-template-columns: 280px 1fr 320px; height: 100%; }
+    aside, .notes { background: var(--panel); overflow: auto; padding: 16px; }
+    h1 { font-size: 15px; font-weight: 600; margin: 0 0 4px; letter-spacing: 0.02em; }
+    .meta { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+    .nav button {
+      display: block; width: 100%; text-align: left; background: transparent; color: var(--ink);
+      border: 0; border-radius: 8px; padding: 8px 10px; cursor: pointer; font-size: 13px;
+    }
+    .nav button:hover, .nav button.active { background: #44403c; }
+    .nav button .n { color: var(--accent); font-variant-numeric: tabular-nums; margin-right: 8px; }
+    .stage { display: flex; flex-direction: column; min-width: 0; }
+    .toolbar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+    .toolbar button {
+      background: #44403c; color: var(--ink); border: 0; border-radius: 8px; padding: 8px 14px; cursor: pointer;
+    }
+    .frame {
+      flex: 1; display: flex; align-items: center; justify-content: center; padding: 8px 16px 24px;
+      min-height: 0;
+    }
+    .frame img, .placeholder {
+      max-width: 100%; max-height: 100%; border-radius: 8px; background: #fff;
+    }
+    .placeholder {
+      width: min(100%, 1100px); aspect-ratio: 16 / 9; display: grid; place-items: center;
+      color: #57534e; font-size: 18px;
+    }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    textarea {
+      width: 100%; height: calc(100vh - 180px); background: #1c1917; color: var(--ink);
+      border: 1px solid #44403c; border-radius: 8px; padding: 12px; font: 13px/1.45 inherit; resize: none;
+    }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; }
+      textarea { height: 160px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <h1>ИНАЯ СРЕДА</h1>
+      <p class="meta">Итоговая 5.0 · 43 слайда<br>Правки пишите в заметках справа — они сохраняются в браузере.</p>
+      <nav class="nav" id="nav"></nav>
+    </aside>
+    <main class="stage">
+      <div class="toolbar">
+        <button type="button" id="prev">← Назад</button>
+        <strong id="label">Слайд 1</strong>
+        <button type="button" id="next">Вперёд →</button>
+      </div>
+      <div class="frame" id="frame"></div>
+    </main>
+    <section class="notes">
+      <label for="note">Заметки к слайду (сохраняются локально)</label>
+      <textarea id="note" placeholder="Что меняем на этом слайде…"></textarea>
+    </section>
+  </div>
+  <script>
+    const slides = [
+      { t: "Портрет основательницы" },
+      { t: "Пустой кадр" },
+      { t: "Торт «Лучший год твоей жизни»" },
+      { t: "Пикник — эстетика" },
+      { t: "Джакузи, оранжевые тюрбаны" },
+      { t: "Большой пикник клуба" },
+      { t: "ИДЕЯ" },
+      { t: "даже если их еще не существует" },
+      { t: "Пустой" },
+      { t: "Если у меня получилось…" },
+      { t: "Пустой" },
+      { t: "Тёмный, контурный текст", empty: true },
+      { t: "Встреча за длинным столом" },
+      { t: "Воркшоп brow ram Permanent" },
+      { t: "Круглый стол / практика" },
+      { t: "Маршрут: Москва–Сочи–Карелия–Эльбрус" },
+      { t: "Арт-воркшоп + поле под текст" },
+      { t: "Вечеринка thefuture" },
+      { t: "Каждой женщине нужна женщина" },
+      { t: "Ужин в винограднике" },
+      { t: "Концерт ко Дню аутизма" },
+      { t: "Выход из воды" },
+      { t: "Видео (MOV)", video: true },
+      { t: "Каждая реализовывала идеи внутри иной среды" },
+      { t: "Тёмный слайд + звезда" },
+      { t: "Миссис Татарстан-2025 — Дарья Шарафеева" },
+      { t: "Скрипка и рояль" },
+      { t: "Группа из 9, шары" },
+      { t: "Контурный текст", empty: true },
+      { t: "Команда на диване" },
+      { t: "Тёмный контурный текст", empty: true },
+      { t: "Два сердца" },
+      { t: "СОВЕТ КЛУБА" },
+      { t: "Ментор — сердце и мотор сообщества" },
+      { t: "Деньги / тариф (недобрано)" },
+      { t: "Пустой" },
+      { t: "Мешок с $" },
+      { t: "Gold-карта DEVICHNIKI_KZN 25–30%" },
+      { t: "Макет сайта + Яна Хабибуллина" },
+      { t: "Логотип иная среда" },
+      { t: "Пустой" },
+      { t: "Тёмный финал, контуры", empty: true },
+      { t: "Пустой" }
+    ];
+
+    const pad = (n) => String(n).padStart(2, "0");
+    const nav = document.getElementById("nav");
+    const frame = document.getElementById("frame");
+    const label = document.getElementById("label");
+    const note = document.getElementById("note");
+    let i = 0;
+
+    slides.forEach((s, idx) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.innerHTML = `<span class="n">${idx + 1}</span>${s.t}`;
+      b.addEventListener("click", () => show(idx));
+      nav.appendChild(b);
+    });
+
+    function key(n) { return "inaya-sreda-note-" + n; }
+
+    function show(idx) {
+      i = (idx + slides.length) % slides.length;
+      const s = slides[i];
+      label.textContent = `Слайд ${i + 1} · ${s.t}`;
+      [...nav.children].forEach((b, k) => b.classList.toggle("active", k === i));
+      const src = `slide-thumbs/slide-${pad(i + 1)}.jpg`;
+      if (s.empty || s.video) {
+        frame.innerHTML = `<div class="placeholder">${s.video ? "Слайд с видео media1.MOV (~134 МБ)" : "Нет растрового превью: текст как векторные контуры из CorelDRAW"}</div>`;
+      } else {
+        frame.innerHTML = `<img src="${src}" alt="Слайд ${i + 1}" onerror="this.parentNode.innerHTML='<div class=placeholder>Нет превью</div>'" />`;
+      }
+      note.value = localStorage.getItem(key(i + 1)) || "";
+    }
+
+    note.addEventListener("input", () => localStorage.setItem(key(i + 1), note.value));
+    document.getElementById("prev").onclick = () => show(i - 1);
+    document.getElementById("next").onclick = () => show(i + 1);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") show(i - 1);
+      if (e.key === "ArrowRight") show(i + 1);
+    });
+    show(0);
+  </script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+Source: иная среда итоговая5.0.pptx
+Slides: 43
+
+===== SLIDE 1 (ppt/slides/slide1.xml) =====
+(no text)
+
+===== SLIDE 2 (ppt/slides/slide2.xml) =====
+(no text)
+
+===== SLIDE 3 (ppt/slides/slide3.xml) =====
+(no text)
+
+===== SLIDE 4 (ppt/slides/slide4.xml) =====
+(no text)
+
+===== SLIDE 5 (ppt/slides/slide5.xml) =====
+(no text)
+
+===== SLIDE 6 (ppt/slides/slide6.xml) =====
+(no text)
+
+===== SLIDE 7 (ppt/slides/slide7.xml) =====
+(no text)
+
+===== SLIDE 8 (ppt/slides/slide8.xml) =====
+(no text)
+
+===== SLIDE 9 (ppt/slides/slide9.xml) =====
+(no text)
+
+===== SLIDE 10 (ppt/slides/slide10.xml) =====
+(no text)
+
+===== SLIDE 11 (ppt/slides/slide11.xml) =====
+(no text)
+
+===== SLIDE 12 (ppt/slides/slide12.xml) =====
+(no text)
+
+===== SLIDE 13 (ppt/slides/slide13.xml) =====
+развитие
+проявление
+
+===== SLIDE 14 (ppt/slides/slide14.xml) =====
+(no text)
+
+===== SLIDE 15 (ppt/slides/slide15.xml) =====
+(no text)
+
+===== SLIDE 16 (ppt/slides/slide16.xml) =====
+(no text)
+
+===== SLIDE 17 (ppt/slides/slide17.xml) =====
+(no text)
+
+===== SLIDE 18 (ppt/slides/slide18.xml) =====
+(no text)
+
+===== SLIDE 19 (ppt/slides/slide19.xml) =====
+(no text)
+
+===== SLIDE 20 (ppt/slides/slide20.xml) =====
+(no text)
+
+===== SLIDE 21 (ppt/slides/slide21.xml) =====
+(no text)
+
+===== SLIDE 22 (ppt/slides/slide22.xml) =====
+(no text)
+
+===== SLIDE 23 (ppt/slides/slide23.xml) =====
+(no text)
+
+===== SLIDE 24 (ppt/slides/slide24.xml) =====
+(no text)
+
+===== SLIDE 25 (ppt/slides/slide25.xml) =====
+(no text)
+
+===== SLIDE 26 (ppt/slides/slide26.xml) =====
+(no text)
+
+===== SLIDE 27 (ppt/slides/slide27.xml) =====
+(no text)
+
+===== SLIDE 28 (ppt/slides/slide28.xml) =====
+(no text)
+
+===== SLIDE 29 (ppt/slides/slide29.xml) =====
+(no text)
+
+===== SLIDE 30 (ppt/slides/slide30.xml) =====
+(no text)
+
+===== SLIDE 31 (ppt/slides/slide31.xml) =====
+(no text)
+
+===== SLIDE 32 (ppt/slides/slide32.xml) =====
+(no text)
+
+===== SLIDE 33 (ppt/slides/slide33.xml) =====
+(no text)
+
+===== SLIDE 34 (ppt/slides/slide34.xml) =====
+(no text)
+
+===== SLIDE 35 (ppt/slides/slide35.xml) =====
+(no text)
+
+===== SLIDE 36 (ppt/slides/slide36.xml) =====
+(no text)
+
+===== SLIDE 37 (ppt/slides/slide37.xml) =====
+(no text)
+
+===== SLIDE 38 (ppt/slides/slide38.xml) =====
+(no text)
+
+===== SLIDE 39 (ppt/slides/slide39.xml) =====
+(no text)
+
+===== SLIDE 40 (ppt/slides/slide40.xml) =====
+(no text)
+
+===== SLIDE 41 (ppt/slides/slide41.xml) =====
+(no text)
+
+===== SLIDE 42 (ppt/slides/slide42.xml) =====
+(no text)
+
+===== SLIDE 43 (ppt/slides/slide43.xml) =====
+(no text)
+

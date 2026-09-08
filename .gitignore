@@ -1,0 +1,30 @@
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+
+# Исходники и рабочие материалы — на сайт не нужны
+scenario-photos/
+pics/
+brand/
+deck-previews/
+slide-previews/
+slide-thumbs/
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+
+# Тяжёлые запасные файлы (есть HTML-дек)
+*.pdf
+*.pptx
+!deck/**
+
+# Локальные кэши
+.nrz/
+.onreza/
+.tmp/
+/tmp/
+dist/
+dist

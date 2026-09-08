@@ -1,0 +1,610 @@
+/* ==========================================================================
+   ИНАЯ СРЕДА — 2 года. Дизайн-система дека.
+   Правила и обоснования — в ../PROMPT.md
+   ========================================================================== */
+
+/* Шрифт подключён отдельным файлом fonts.css в index.html — он вшит
+   в base64, иначе Chrome не отдаст его при открытии с file:// */
+
+:root {
+  /* Палитра: три цвета из вектора логотипа, плюс производные тем же тоном.
+     Ничего нового не добавлять. */
+  --ink: #141413;          /* истинно тёмный — только слайд 21 */
+  --bg: #1f1e1c;           /* базовый фон дека, с тауповым подмесом */
+  --bg-raise: #272521;     /* подложки и плашки */
+  --taupe: #877c6b;
+  --light: #d8e0e0;
+
+  /* Проектор съедает тонкие оттенки: вторичный текст не ниже 62%,
+     декоративные подложки не ниже 15%. */
+  --light-dim: rgba(216, 224, 224, 0.62);
+  --taupe-soft: rgba(135, 124, 107, 0.18);
+  --taupe-line: rgba(135, 124, 107, 0.42);
+
+  /* Модуль */
+  --margin: 100px;
+  --safe-bottom: 120px;    /* нижнюю кромку экрана перекрывают первые ряды */
+  --gutter: 40px;
+  --col: 106.67px;
+
+  /* Четыре ступени иерархии, больше не заводить.
+     Минимум 32px — поправка на проектор. */
+  --display: 128px;
+  --h1: 80px;
+  --body: 40px;
+  --cap: 32px;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur: 420ms;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: 'Onest', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#viewport {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* Сцена фиксированного размера, вписывается в окно масштабированием.
+   Это даёт пиксельную точность вёрстки и совпадение с PDF-выгрузкой. */
+.stage {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  flex: none;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--light);
+  display: none;
+}
+.stage.current { display: block; }
+
+/* --------------------------------------------------------------------------
+   Типографика
+   -------------------------------------------------------------------------- */
+
+.display {
+  font-size: var(--display);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+/* Заголовки набираются строчными в самой разметке, а не через
+   text-transform: так уровень годится и для заголовка, и для фразы. */
+.h1 {
+  font-size: var(--h1);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+.body {
+  font-size: var(--body);
+  font-weight: 400;
+  line-height: 1.4;
+}
+.cap {
+  font-size: var(--cap);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--light-dim);
+}
+.accent { color: var(--taupe); }
+.dim { color: var(--light-dim); }
+
+/* --------------------------------------------------------------------------
+   Звезда: буллет, разделитель, маркер паузы, фоновая фактура
+   -------------------------------------------------------------------------- */
+
+.star { display: block; color: var(--taupe); flex: none; }
+.star svg { display: block; width: 100%; height: 100%; }
+.star-bullet { width: 26px; height: 26px; margin-top: 15px; }
+.star-mark { width: 76px; height: 76px; }
+.star-pause { width: 120px; height: 120px; }
+
+/* Фоновая фактура. Звезда показывается целиком и внутри кадра: обрезанная
+   краем, она даёт плоские торцы лучей и читается как случайное пятно.
+   15% — ниже проектор просто не покажет. */
+.star-bg {
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  right: 108px;
+  bottom: 172px;
+  color: var(--taupe);
+  opacity: 0.15;
+  pointer-events: none;
+}
+.star-bg.left { right: auto; left: 108px; }
+
+.rule {
+  width: 100%;
+  height: 3px;                 /* тоньше 3px проектор размывает */
+  background: var(--taupe-line);
+  border: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Общие раскладки
+   -------------------------------------------------------------------------- */
+
+.pad {
+  position: absolute;
+  inset: var(--margin) var(--margin) var(--safe-bottom);
+  display: flex;
+  flex-direction: column;
+}
+.center { justify-content: center; }
+.middle { align-items: center; text-align: center; }
+.end { justify-content: flex-end; }
+
+/* Две колонки внутри рабочей области */
+.cols { display: flex; gap: 100px; flex: 1; min-height: 0; align-items: stretch; }
+
+/* align-self обязателен: .pad — flex-колонка со stretch по умолчанию,
+   без него картинка растягивается на всю ширину и ломает пропорции. */
+.logo { display: block; height: 116px; width: auto; align-self: flex-start; }
+.logo-lg { height: 190px; }
+.middle .logo { align-self: center; }
+
+.slide-no {
+  position: absolute;
+  right: var(--margin);
+  bottom: 54px;
+  font-size: var(--cap);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: rgba(216, 224, 224, 0.3);
+}
+
+/* Полноэкранное фото с затемнением под текст.
+
+   Шторка — только в полосе текста. Контраст букв — узкий контур у знака,
+   без мягкого ореола: 30–40px blur превращался в «плашку» и наезжал
+   на соседние строки и на лица в кадре. */
+.bleed { position: absolute; inset: 0; }
+.bleed img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Снизу вверх — когда текст в .pad.end и лица выше полосы набора. */
+.bleed::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    0deg,
+    rgba(20, 20, 19, 0.58) 0%,
+    rgba(20, 20, 19, 0.28) 32%,
+    rgba(20, 20, 19, 0.06) 52%,
+    rgba(20, 20, 19, 0) 72%
+  );
+}
+
+.bleed.soft::after {
+  background: linear-gradient(
+    0deg,
+    rgba(20, 20, 19, 0.55) 0%,
+    rgba(20, 20, 19, 0.22) 28%,
+    rgba(20, 20, 19, 0.04) 48%,
+    rgba(20, 20, 19, 0) 68%
+  );
+}
+
+/* Сверху вниз — когда лица в нижней половине кадра (слайд 6). */
+.bleed.top::after {
+  background: linear-gradient(
+    180deg,
+    rgba(20, 20, 19, 0.5) 0%,
+    rgba(20, 20, 19, 0.2) 28%,
+    rgba(20, 20, 19, 0.04) 48%,
+    rgba(20, 20, 19, 0) 68%
+  );
+}
+
+/* Узкий контур: отделяет букву от пёстрого фона, не рисуя пятна под строкой. */
+.stage:has(.bleed) .pad {
+  text-shadow:
+    0 1px 0 rgba(20, 20, 19, 0.55),
+    0 0 1px rgba(20, 20, 19, 0.8);
+}
+
+/* Кадр со сцены. Белый экран за спикером съедает светлый текст —
+   поэтому шторка держит плотность по всей высоте набора (~нижние 55%),
+   а выше отпускает портрет и имя. */
+.bleed.stage-shot img { object-position: center 22%; }
+.bleed.stage-shot::after {
+  background: linear-gradient(
+    0deg,
+    rgba(20, 20, 19, 0.94) 0%,
+    rgba(20, 20, 19, 0.88) 42%,
+    rgba(20, 20, 19, 0.62) 62%,
+    rgba(20, 20, 19, 0.2) 82%,
+    rgba(20, 20, 19, 0) 100%
+  );
+}
+
+.stage:has(.bleed.stage-shot) .pad {
+  text-shadow:
+    0 1px 0 rgba(20, 20, 19, 0.95),
+    0 0 3px rgba(20, 20, 19, 0.9),
+    0 6px 28px rgba(20, 20, 19, 0.65);
+}
+
+/* Тауп на фото с нижней шторкой даёт ~2.5:1 — на проекторе пропадает.
+   Поднимаем к светлому таупу только поверх bleed. */
+.stage:has(.bleed) .accent { color: #c9bba8; }
+
+.stage:has(.bleed) .cap { color: rgba(216, 224, 224, 0.92); }
+
+/* --------------------------------------------------------------------------
+   Архетип D — история героини.
+   Вертикальное фото на всю высоту, текст рядом. Сторона чередуется.
+   Вертикальные кадры никогда не растягиваются на 16:9.
+   -------------------------------------------------------------------------- */
+
+.split { position: absolute; inset: 0; display: flex; }
+.split .shot { position: relative; width: 46%; flex: none; overflow: hidden; }
+.split .shot img { width: 100%; height: 100%; object-fit: cover; }
+.split .shot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(31, 30, 28, 0) 72%, rgba(31, 30, 28, 0.55) 100%);
+}
+.split.right { flex-direction: row-reverse; }
+.split.right .shot::after {
+  background: linear-gradient(270deg, rgba(31, 30, 28, 0) 72%, rgba(31, 30, 28, 0.55) 100%);
+}
+.split .side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--margin) 84px calc(var(--safe-bottom) + 20px);
+}
+
+.hero-name {
+  font-size: 74px;
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.hero-facts { list-style: none; margin-top: 40px; display: grid; gap: 20px; }
+.hero-facts li { display: flex; gap: 22px; font-size: var(--body); line-height: 1.3; }
+.hero-quote {
+  margin-top: 56px;
+  padding-top: 40px;
+  border-top: 3px solid var(--taupe-line);
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1.28;
+  color: var(--light);
+}
+.hero-quote .accent { display: block; }
+
+/* --------------------------------------------------------------------------
+   Архетип E — плитка. Равные ячейки, один зазор на весь дек.
+   -------------------------------------------------------------------------- */
+
+/* Полоса плиток. Ячейка задана пропорцией 3:4 под вертикальный кадр —
+   растянутые на всю высоту колонки режут лица.
+   Зазор один на весь дек. */
+.band { display: grid; gap: var(--gutter); }
+.band.n4 { grid-template-columns: repeat(4, 1fr); }
+.band.n5 { grid-template-columns: repeat(5, 1fr); }
+.band.n6 { grid-template-columns: repeat(6, 1fr); }
+.band .tile { aspect-ratio: 3 / 4; }
+
+.tile { position: relative; overflow: hidden; background: var(--bg-raise); }
+.tile img { width: 100%; height: 100%; object-fit: cover; }
+.tile figcaption {
+  position: absolute;
+  left: 26px;
+  right: 26px;
+  bottom: 24px;
+  z-index: 2; /* поверх шторки .shade::after */
+  font-size: var(--cap);
+  font-weight: 500;
+  line-height: 1.22;
+  color: var(--light);
+  text-shadow: 0 1px 12px rgba(20, 20, 19, 0.55);
+}
+/* Двухстрочная подпись героини: имя и специальность */
+.tile figcaption b { display: block; font-size: 38px; font-weight: 600; letter-spacing: -0.01em; }
+.tile figcaption span {
+  display: block;
+  margin-top: 8px;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: rgba(216, 224, 224, 0.92);
+}
+.tile.shade::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  /* Ниже, чем раньше: шторка держит контраст, но не «съедает» лицо и не
+     серит текст, который уже лежит поверх неё. */
+  background: linear-gradient(0deg, rgba(20, 20, 19, 0.72) 0%, rgba(20, 20, 19, 0.32) 34%, rgba(20, 20, 19, 0) 62%);
+}
+
+/* --------------------------------------------------------------------------
+   Архетип F — стопка. Кадры не лежат сеткой, а падают один на другой:
+   каждый шаг докладывает снимок в общую пачку. Кадр 570×760 — почти вдвое
+   больше ячейки .band, потому что на слайдах 11 и 15 фотография и есть
+   содержание, а не иллюстрация к тексту.
+   -------------------------------------------------------------------------- */
+
+.deal { display: flex; flex: 1; min-height: 0; align-items: center; gap: 100px; }
+.deal .side {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Размеры пачки посчитаны так, чтобы наклон ±5° и разбег ±30px укладывались
+   в рабочую область 1720×860 и ни один угол не уходил за кромку. */
+.stack { position: relative; flex: none; width: 720px; height: 858px; }
+.stack .tile {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 570px;
+  height: 760px;
+  margin: -380px 0 0 -285px;
+  aspect-ratio: auto;
+  /* Светлый кант и тень отделяют кадр от кадра: без них пачка читается
+     как один рваный коллаж. 12px при 1920 проектор ещё держит. */
+  border: 12px solid var(--light);
+  box-shadow: 0 26px 64px rgba(0, 0, 0, 0.6);
+  transform: translate(var(--dx, 0), var(--dy, 0)) rotate(var(--rot, 0deg));
+}
+.stack .tile:nth-child(1) { --rot: -5deg; --dx: -30px; --dy: 10px;  z-index: 1; }
+.stack .tile:nth-child(2) { --rot: 4deg;  --dx: 28px;  --dy: -12px; z-index: 2; }
+.stack .tile:nth-child(3) { --rot: -2deg; --dx: -14px; --dy: 12px;  z-index: 3; }
+.stack .tile:nth-child(4) { --rot: 5deg;  --dx: 30px;  --dy: 4px;   z-index: 4; }
+.stack .tile:nth-child(5) { --rot: -3deg; --dx: 4px;   --dy: -8px;  z-index: 5; }
+.stack .tile:nth-child(6) { --rot: 2deg;  --dx: -22px; --dy: -2px;  z-index: 6; }
+
+/* Своя пара состояний для шага: базовый .step сбрасывает transform в none
+   и вместе с ним стёр бы наклон кадра. Здесь наклон сохраняется, а кадр
+   «кладётся» сверху — приходит чуть крупнее и выше своего места. */
+.stack .tile.step {
+  opacity: 0;
+  transform: translate(var(--dx, 0), var(--dy, 0)) rotate(var(--rot, 0deg))
+             translateY(-56px) scale(1.05);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.stack .tile.step.on {
+  opacity: 1;
+  transform: translate(var(--dx, 0), var(--dy, 0)) rotate(var(--rot, 0deg));
+}
+
+/* Имена рядом со стопкой: подпись съезжала бы под следующий кадр, поэтому
+   героини перечисляются в колонке и накапливаются вместе с кадрами. */
+.names { list-style: none; margin-top: 40px; display: grid; gap: 20px; }
+.names li { display: flex; gap: 22px; align-items: flex-start; }
+.names b { font-size: 42px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.05; }
+.names .role { display: block; margin-top: 6px; font-size: 28px; color: var(--light-dim); }
+/* Последняя выложенная героиня подсвечивается — глаз связывает её
+   с кадром, который только что лёг сверху. */
+.names li.step.on:not(:has(~ li.step.on)) b { color: var(--taupe); }
+
+/* Короткие ярлыки идут строкой, а не колонкой: шести подписям колонка
+   стоила бы всю высоту слайда. Звезда работает разделителем. */
+.tags { list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 26px; margin-top: 40px; }
+.tags li {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  font-size: 44px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.star-tag { width: 22px; height: 22px; }
+.tags li.step.on:not(:has(~ li.step.on)) { color: var(--taupe); }
+
+/* Реплика под стопкой. Ниже .h1: рядом с крупными ярлыками и кадром
+   заголовочный кегль спорил бы за внимание. */
+.quiet {
+  margin-top: 48px;
+  font-size: 52px;
+  font-weight: 400;
+  line-height: 1.24;
+  letter-spacing: -0.01em;
+}
+.quiet .accent { display: block; }
+
+/* Полноэкранная шторка: текст поверх заставки */
+.scrim { position: absolute; inset: 0; background: rgba(20, 20, 19, 0.72); }
+
+/* Видеослот. Кадр-постер лежит под видео: в PDF видео не живёт,
+   и на его место встаёт статичный кадр. */
+.videoslot { position: absolute; inset: 0; overflow: hidden; background: var(--ink); }
+.videoslot img,
+.videoslot video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+body.printing .videoslot video { display: none; }
+
+/* В заставке есть собственный словомарк, и он спорит с текстом, который
+   ложится поверх. Как только шторка поднимается, кадр уходит в расфокус:
+   остаётся золотое свечение, но не вторая надпись.
+   Через :has(), чтобы работало и в печатной раскладке. */
+.stage:has(.scrim.on) .videoslot img,
+.stage:has(.scrim.on) .videoslot video {
+  filter: blur(20px) brightness(0.8);
+  transform: scale(1.06);      /* прячет размытые края кадра */
+}
+
+/* --------------------------------------------------------------------------
+   Архетип F — список с раскрытием
+   -------------------------------------------------------------------------- */
+
+.list { list-style: none; display: grid; gap: 26px; }
+.list li { display: flex; gap: 26px; font-size: 46px; line-height: 1.25; }
+.list .num {
+  color: var(--taupe);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-width: 62px;
+}
+.list.two-col { grid-template-columns: 1fr 1fr; gap: 26px 80px; }
+
+/* --------------------------------------------------------------------------
+   Архетип G — схемы
+   -------------------------------------------------------------------------- */
+
+/* Ступени 1.0 → 2.0 → 3.0 */
+.ladder { display: grid; gap: 0; }
+.rung { display: flex; align-items: baseline; gap: 40px; padding: 26px 0; }
+.rung .ver { font-size: 90px; font-weight: 600; letter-spacing: -0.02em; min-width: 420px; }
+.rung .what { font-size: 52px; font-weight: 400; color: var(--light-dim); }
+.rung.now .ver, .rung.now .what { color: var(--taupe); }
+.rung.now .what { color: var(--light); }
+.rung + .rung { border-top: 3px solid var(--taupe-line); }
+
+/* Таблица было → стало */
+.shift { display: grid; grid-template-columns: 1fr 160px 1fr; align-items: center; }
+.shift .head { font-size: var(--cap); font-weight: 500; text-transform: uppercase; letter-spacing: 0.14em; color: var(--light-dim); padding-bottom: 28px; }
+.shift .row { font-size: 62px; line-height: 1.18; padding: 28px 0; border-top: 3px solid var(--taupe-line); }
+.shift .row.was { color: var(--light-dim); }
+.shift .row.now { color: var(--light); font-weight: 500; }
+.shift .row.arrow { border-top-color: transparent; display: grid; place-items: center; }
+.shift .row.arrow .star { width: 38px; height: 38px; }
+
+/* Пары «не больше — ближе» */
+.pairs { display: grid; grid-template-columns: 1fr 1fr; gap: 44px 90px; }
+.pair .no { font-size: 40px; color: var(--light-dim); }
+.pair .yes { font-size: 68px; font-weight: 600; color: var(--taupe); line-height: 1.08; margin-top: 8px; }
+
+/* Экосистема */
+.eco { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gutter); }
+.eco .node {
+  background: var(--taupe-soft);
+  border: 3px solid var(--taupe-line);
+  padding: 34px 36px;
+  font-size: 46px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-height: 208px;
+}
+.eco .node .star { width: 22px; height: 22px; margin: 0; }
+
+/* Крупные цифры */
+.figures { display: flex; gap: 100px; }
+.figure .num { font-size: 150px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; color: var(--taupe); }
+.figure .lab { font-size: var(--body); color: var(--light-dim); margin-top: 12px; }
+
+/* --------------------------------------------------------------------------
+   Архетип H — чёрный экран. Единственное место с истинным --ink.
+   -------------------------------------------------------------------------- */
+
+.stage.blackout { background: var(--ink); }
+
+/* --------------------------------------------------------------------------
+   Честные плейсхолдеры вместо стоков.
+   Стоковые фото в этот дек не попадают ни при каких обстоятельствах.
+   -------------------------------------------------------------------------- */
+
+.ph {
+  display: grid;
+  place-items: center;
+  align-content: center;      /* иначе строки растягиваются по высоте блока */
+  gap: 16px;
+  text-align: center;
+  border: 3px dashed var(--taupe-line);
+  background: var(--taupe-soft);
+  color: var(--taupe);
+  padding: 40px;
+  min-height: 0;
+}
+.ph .what { font-size: var(--cap); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; }
+.ph .note { font-size: 32px; font-weight: 400; color: var(--light-dim); letter-spacing: 0; text-transform: none; max-width: 20ch; line-height: 1.25; }
+.ph.qr { width: 300px; height: 300px; flex: none; }
+
+/* QR на светлой плашке. Размер выбран под зал: 320px при 1920 — это около
+   60 см на четырёхметровом экране, считывается с середины зала. */
+.qr-img { width: 320px; height: 320px; flex: none; display: block; }
+.ph.wide { flex: 1; }
+.ph.fill { position: absolute; inset: 0; }
+/* Слот под будущий макет: подпись уходит в угол, чтобы не лезть
+   под контент, который лежит поверх слота. */
+.ph.slot { place-items: start; align-content: start; text-align: left; padding: 44px; }
+.ph.slot .note { max-width: 32ch; }
+
+/* --------------------------------------------------------------------------
+   Пошаговые появления. Строго функциональные:
+   прозрачность и сдвиг не больше 40px.
+   -------------------------------------------------------------------------- */
+
+.step {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.step.on { opacity: 1; transform: none; }
+.step.no-move { transform: none; }
+
+/* --------------------------------------------------------------------------
+   Служебное: индикатор перехода на слайд по номеру
+   -------------------------------------------------------------------------- */
+
+#jump {
+  position: fixed;
+  left: 50%;
+  bottom: 48px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--light);
+  border: 2px solid var(--taupe);
+  padding: 14px 28px;
+  font-size: 26px;
+  letter-spacing: 0.1em;
+  font-family: 'Onest', sans-serif;
+  display: none;
+}
+#jump.on { display: block; }
+
+/* --------------------------------------------------------------------------
+   Печать: каждый шаг анимации — отдельная страница.
+   Иначе на запасном PDF развалится драматургия пауз.
+   -------------------------------------------------------------------------- */
+
+@page { size: 1920px 1080px; margin: 0; }
+
+body.printing { overflow: visible; background: var(--bg); }
+body.printing #viewport { position: static; display: block; }
+body.printing #jump { display: none; }
+body.printing .stage {
+  display: block !important;
+  break-after: page;
+  page-break-after: always;
+}
+body.printing .step { opacity: 0; transform: none; transition: none; }
+body.printing .step.on { opacity: 1; }
+
+@media print {
+  html, body { overflow: visible; height: auto; }
+  .stage { break-after: page; page-break-after: always; }
+}

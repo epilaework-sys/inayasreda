@@ -1,0 +1,12 @@
+{
+  "name": "inayasreda",
+  "private": true,
+  "description": "ИНАЯ СРЕДА — презентация 2 года (статический HTML-дек)",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "npx --yes serve dist -l 3000"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
