@@ -1,0 +1,15 @@
+#:schema https://docs.onreza.ru/schemas/onreza-project-v1.schema.json
+
+# Статический HTML-дек: без Node/Bun runtime.
+# Без compute=static платформа принимает deck.js за entry point сервера.
+
+[project]
+name = "inayasreda"
+
+[build]
+install_command = "npm install --ignore-scripts"
+command = "npm run build"
+output_directory = "dist"
+
+[deploy]
+compute = "static"

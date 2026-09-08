@@ -3,8 +3,7 @@
   "private": true,
   "description": "ИНАЯ СРЕДА — презентация 2 года (статический HTML-дек)",
   "scripts": {
-    "build": "node scripts/build.mjs",
-    "start": "npx --yes serve dist -l 3000"
+    "build": "node scripts/build.mjs"
   },
   "engines": {
     "node": ">=18"

@@ -15,11 +15,15 @@ HTML-презентация юбилея клуба. Самодостаточн�
 
 | Настройка | Значение |
 |---|---|
-| Framework | Other / Static (или Auto) |
+| Compute | **Static** (обязательно — не Process) |
 | Build Command | `npm run build` |
 | Output Directory | `dist` |
 | Root Directory | `.` |
-| Install Command | можно оставить пустым — зависимостей нет |
+| Install Command | `npm install --ignore-scripts` |
+
+В репозитории лежит `onreza.toml` с `deploy.compute = "static"`. Если в UI
+проекта Compute всё ещё Process — переключите вручную: иначе платформа
+пытается запустить браузерный JS как Bun-сервер.
 
 После пуша в `main` и привязки репозитория в [app.onreza.ru](https://app.onreza.ru) платформа соберёт `dist/` и опубликует статику.
 
