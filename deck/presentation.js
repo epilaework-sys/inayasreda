@@ -94,6 +94,34 @@
     themeBtn.hidden = true;
   }
 
+  // Съёмка кадров (?k=): прячем пилюлю темы и не грузим видео —
+  // иначе headless Chrome зависает на 76–90 МБ роликах. На кадре остаётся постер.
+  var captureMode = /[?&]k=\d+/.test(location.search);
+  if (captureMode) {
+    if (themeBtn) themeBtn.hidden = true;
+    [].forEach.call(document.querySelectorAll('video'), function (v) {
+      try { v.pause(); } catch (e) {}
+      v.removeAttribute('src');
+      v.removeAttribute('autoplay');
+      v.preload = 'none';
+      try { v.load(); } catch (e) {}
+      v.style.display = 'none';
+    });
+  }
+
+  function stripInactiveMedia() {
+    if (!captureMode) return;
+    slides.forEach(function (slide, i) {
+      if (i === index) return;
+      [].forEach.call(slide.querySelectorAll('img[src], video[src]'), function (el) {
+        el.removeAttribute('src');
+        if (el.tagName === 'VIDEO') {
+          try { el.load(); } catch (e) {}
+        }
+      });
+    });
+  }
+
   function paintStars(root) {
     [].forEach.call(root.querySelectorAll('.star'), function (el) {
       if (!el.firstChild) el.innerHTML = STAR;
@@ -230,6 +258,7 @@
       group.forEach(function (el) { el.classList.toggle('on', gi < step); });
     });
     location.hash = String(index + 1);
+    stripInactiveMedia();
   }
 
   function go(i, atEnd) {
@@ -313,7 +342,13 @@
 
   // ?all — открыть слайд со всеми раскрытыми шагами.
   // Нужно для съёмки превью и для проверки вёрстки в конечном состоянии.
+  // ?k=N — раскрыть ровно N шагов (для съёмки PPTX/PDF по кадрам).
   var showAll = /[?&]all/.test(location.search);
   var start = parseInt((location.hash || '').replace('#', ''), 10);
+  var kMatch = location.search.match(/[?&]k=(\d+)/);
   go(isNaN(start) ? 0 : start - 1, showAll);
+  if (kMatch && !showAll) {
+    step = Math.max(0, Math.min(steps.length, parseInt(kMatch[1], 10)));
+    render();
+  }
 })();
