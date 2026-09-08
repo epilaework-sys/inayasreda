@@ -104,12 +104,11 @@ CHROME='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 под материалы, которых пока нет:
 
 - **слайд 7** — видеомонтаж от Диляры
-- **слайд 25** — QR на бота
 
-QR на сайт готов. Второй генерируется той же командой, как только будет ссылка на бота:
+QR на сайт стоит на финальном слайде. Генерация:
 
 ```
-python3 make-qr.py https://t.me/ВАШ_БОТ deck/qr-bot.png
+python3 make-qr.py https://inayasreda.ru/ deck/qr-site.png
 ```
 
 
