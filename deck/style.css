@@ -586,6 +586,39 @@ body.printing .videoslot video { display: none; }
 }
 #jump.on { display: block; }
 
+/* Переключатель темы — правый верх экрана, поверх масштабированной сцены.
+   Не внутри .stage: иначе уедет вместе с transform: scale. */
+#theme-toggle {
+  position: fixed;
+  top: 28px;
+  right: 28px;
+  z-index: 40;
+  appearance: none;
+  border: 2px solid var(--taupe-line);
+  background: rgba(31, 30, 28, 0.72);
+  color: var(--light);
+  font-family: 'Onest', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 12px 20px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+#theme-toggle:hover { border-color: var(--taupe); }
+body.light #theme-toggle {
+  background: rgba(242, 239, 233, 0.82);
+  color: var(--light);
+}
+#theme-toggle .theme-toggle-label[data-when="light"] { display: none; }
+body.light #theme-toggle .theme-toggle-label[data-when="dark"] { display: none; }
+body.light #theme-toggle .theme-toggle-label[data-when="light"] { display: inline; }
+
+body.printing #theme-toggle { display: none; }
+
 /* --------------------------------------------------------------------------
    Печать: каждый шаг анимации — отдельная страница.
    Иначе на запасном PDF развалится драматургия пауз.

@@ -17,28 +17,81 @@
 
   var viewport = document.getElementById('viewport');
   var jumpBox = document.getElementById('jump');
+  var themeBtn = document.getElementById('theme-toggle');
   var slides = [].slice.call(document.querySelectorAll('.stage'));
   var printMode = /[?&]print/.test(location.search);
 
-  /* ---------- Светлая тема ------------------------------------------------ */
+  /* ---------- Тема -------------------------------------------------------- */
 
-  // Всё, что можно, светлая тема делает переменными в theme-light.css.
-  // Здесь остаётся только растр: у логотипа и QR под светлый фон нужны
-  // отдельные файлы, переменными их не перекрасить.
-  if (/[?&]light/.test(location.search)) {
-    document.body.classList.add('light');
-    var swap = { 'logo-dark.png': 'logo-light.png', 'qr-site.png': 'qr-site-light.png' };
+  // Растр логотипа и QR переменными не перекрасить — меняем src.
+  // На bleed / blackout / videoslot файлы не трогаем: там фон остаётся тёмным.
+  var THEME_SWAP = {
+    toLight: { 'logo-dark.png': 'logo-light.png', 'qr-site.png': 'qr-site-light.png' },
+    toDark:  { 'logo-light.png': 'logo-dark.png', 'qr-site-light.png': 'qr-site.png' }
+  };
+
+  function themeLocked(img) {
+    var stage = img.closest('.stage');
+    return !!(stage && (stage.classList.contains('blackout') ||
+                        stage.querySelector('.bleed, .videoslot')));
+  }
+
+  function swapThemeAssets(toLight) {
+    var map = toLight ? THEME_SWAP.toLight : THEME_SWAP.toDark;
     [].forEach.call(document.images, function (img) {
       var file = img.getAttribute('src');
-      if (!swap[file]) return;
-      // Фото на вылет, чёрный экран и заставка остаются тёмными и в светлой
-      // теме — растр на них подменять нельзя, иначе логотип и QR потеряются
-      // на собственном фоне.
-      var stage = img.closest('.stage');
-      if (stage && (stage.classList.contains('blackout') ||
-                    stage.querySelector('.bleed, .videoslot'))) return;
-      img.setAttribute('src', swap[file]);
+      if (!map[file] || themeLocked(img)) return;
+      img.setAttribute('src', map[file]);
     });
+  }
+
+  function isLight() {
+    return document.body.classList.contains('light');
+  }
+
+  function setTheme(light, persist) {
+    var was = isLight();
+    document.body.classList.toggle('light', !!light);
+    if (was !== !!light) swapThemeAssets(!!light);
+
+    var url = new URL(location.href);
+    var params = new URLSearchParams(url.search);
+    params.delete('light');
+    params.delete('dark');
+    var parts = [];
+    params.forEach(function (v, k) {
+      parts.push(v === '' ? k : k + '=' + encodeURIComponent(v));
+    });
+    if (light) parts.unshift('light');
+    history.replaceState(null, '', url.pathname + (parts.length ? '?' + parts.join('&') : '') + url.hash);
+
+    if (persist !== false) {
+      try { localStorage.setItem('inaya-theme', light ? 'light' : 'dark'); } catch (e) {}
+    }
+    if (themeBtn) {
+      themeBtn.setAttribute('aria-pressed', light ? 'true' : 'false');
+      themeBtn.title = light ? 'Тёмная тема' : 'Светлая тема';
+    }
+  }
+
+  // Старт: ?light / ?dark важнее памяти; иначе localStorage; иначе тёмная.
+  var startLight = /[?&]light(?:&|$|=)/.test(location.search);
+  var startDark = /[?&]dark(?:&|$|=)/.test(location.search);
+  if (!startLight && !startDark) {
+    try { startLight = localStorage.getItem('inaya-theme') === 'light'; } catch (e) {}
+  }
+  if (startDark) startLight = false;
+  setTheme(startLight, false);
+
+  if (themeBtn && !printMode) {
+    themeBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      setTheme(!isLight(), true);
+      themeBtn.blur();
+    });
+  } else if (themeBtn) {
+    themeBtn.hidden = true;
   }
 
   function paintStars(root) {
@@ -176,6 +229,9 @@
 
   document.addEventListener('keydown', function (e) {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    // Не перехватываем клавиши, пока фокус на кнопке темы.
+    var tag = (e.target && e.target.tagName) || '';
+    if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'TEXTAREA') return;
 
     if (e.key >= '0' && e.key <= '9') {
       typed = (typed + e.key).slice(0, 2);
