@@ -209,11 +209,17 @@
     });
   }
 
+  function syncThemeToggle() {
+    if (!themeBtn || printMode) return;
+    themeBtn.classList.toggle('on', index === 0);
+  }
+
   function render() {
     slides.forEach(function (slide, i) {
       slide.classList.toggle('current', i === index);
     });
     syncVideo();
+    syncThemeToggle();
     steps = stepsOf(slides[index]);
     steps.forEach(function (group, gi) {
       group.forEach(function (el) { el.classList.toggle('on', gi < step); });

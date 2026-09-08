@@ -591,48 +591,83 @@ body.printing .videoslot video { display: none; }
 }
 #jump.on { display: block; }
 
-/* Переключатель темы — правый верх экрана, поверх масштабированной сцены.
+/* Переключатель темы — пилюля только на титуле (видимость через .on в JS).
    Не внутри .stage: иначе уедет вместе с transform: scale. */
 #theme-toggle {
   position: fixed;
-  top: 24px;
-  right: 24px;
+  top: 28px;
+  right: 28px;
   z-index: 9999;
   appearance: none;
-  width: 48px;
-  height: 48px;
+  border: 0;
   padding: 0;
-  display: grid;
-  place-items: center;
-  border: 2px solid var(--taupe);
-  border-radius: 50%;
-  background: rgba(31, 30, 28, 0.88);
-  color: var(--taupe);
+  background: transparent;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease), transform var(--dur) var(--ease);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
-#theme-toggle:hover {
-  color: var(--light);
-  border-color: var(--light);
-  transform: scale(1.06);
-}
-body.light #theme-toggle {
-  background: rgba(242, 239, 233, 0.92);
-  color: var(--taupe);
-  box-shadow: 0 4px 18px rgba(20, 20, 19, 0.18);
-}
-body.light #theme-toggle:hover {
-  color: var(--light);
-  border-color: var(--light);
+#theme-toggle.on {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
 }
 
-#theme-toggle .theme-icon { display: block; pointer-events: none; }
-#theme-toggle .theme-icon-moon { display: none; }
-body.light #theme-toggle .theme-icon-sun { display: none; }
-body.light #theme-toggle .theme-icon-moon { display: block; }
+.theme-track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 72px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--taupe-line);
+  background: rgba(31, 30, 28, 0.72);
+  color: rgba(216, 224, 224, 0.45);
+  box-sizing: border-box;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+#theme-toggle:hover .theme-track { border-color: var(--taupe); }
+
+.theme-track .theme-icon {
+  position: relative;
+  z-index: 1;
+  display: block;
+  flex: none;
+  transition: color var(--dur) var(--ease);
+}
+.theme-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--taupe);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  transition: transform var(--dur) var(--ease), background var(--dur) var(--ease);
+  z-index: 0;
+}
+
+/* Тёмная тема: бегунок слева, солнце активнее */
+#theme-toggle .theme-icon-sun { color: rgba(20, 20, 19, 0.9); }
+/* Светлая: бегунок справа, луна активнее */
+body.light .theme-track {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(110, 99, 83, 0.35);
+  color: rgba(20, 20, 19, 0.35);
+}
+body.light .theme-knob {
+  transform: translateX(36px);
+  background: var(--taupe);
+  box-shadow: 0 2px 8px rgba(20, 20, 19, 0.18);
+}
+body.light #theme-toggle .theme-icon-sun { color: rgba(20, 20, 19, 0.35); }
+body.light #theme-toggle .theme-icon-moon { color: #fff; }
 
 body.printing #theme-toggle { display: none !important; }
 
