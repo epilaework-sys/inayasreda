@@ -595,34 +595,46 @@ body.printing .videoslot video { display: none; }
    Не внутри .stage: иначе уедет вместе с transform: scale. */
 #theme-toggle {
   position: fixed;
-  top: 28px;
-  right: 28px;
-  z-index: 40;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
   appearance: none;
-  border: 2px solid var(--taupe-line);
-  background: rgba(31, 30, 28, 0.72);
-  color: var(--light);
-  font-family: 'Onest', sans-serif;
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 12px 20px;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--taupe);
+  border-radius: 50%;
+  background: rgba(31, 30, 28, 0.88);
+  color: var(--taupe);
   cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
-#theme-toggle:hover { border-color: var(--taupe); }
-body.light #theme-toggle {
-  background: rgba(242, 239, 233, 0.82);
+#theme-toggle:hover {
   color: var(--light);
+  border-color: var(--light);
+  transform: scale(1.06);
 }
-#theme-toggle .theme-toggle-label[data-when="light"] { display: none; }
-body.light #theme-toggle .theme-toggle-label[data-when="dark"] { display: none; }
-body.light #theme-toggle .theme-toggle-label[data-when="light"] { display: inline; }
+body.light #theme-toggle {
+  background: rgba(242, 239, 233, 0.92);
+  color: var(--taupe);
+  box-shadow: 0 4px 18px rgba(20, 20, 19, 0.18);
+}
+body.light #theme-toggle:hover {
+  color: var(--light);
+  border-color: var(--light);
+}
 
-body.printing #theme-toggle { display: none; }
+#theme-toggle .theme-icon { display: block; pointer-events: none; }
+#theme-toggle .theme-icon-moon { display: none; }
+body.light #theme-toggle .theme-icon-sun { display: none; }
+body.light #theme-toggle .theme-icon-moon { display: block; }
+
+body.printing #theme-toggle { display: none !important; }
 
 /* --------------------------------------------------------------------------
    Печать: каждый шаг анимации — отдельная страница.

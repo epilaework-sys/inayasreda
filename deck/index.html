@@ -449,9 +449,17 @@
 </div>
 
 <div id="jump"></div>
-<button type="button" id="theme-toggle" aria-label="Переключить тему" title="Тема">
-  <span class="theme-toggle-label" data-when="dark">светлая</span>
-  <span class="theme-toggle-label" data-when="light">тёмная</span>
+<button type="button" id="theme-toggle" aria-label="Переключить тему" title="Светлая тема">
+  <!-- Солнце на тёмной теме: жми → светлая. Луна на светлой: жми → тёмная. -->
+  <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+    <circle cx="12" cy="12" r="4" fill="currentColor"/>
+    <path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+      d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.05 5.05l1.56 1.56M17.39 17.39l1.56 1.56M5.05 18.95l1.56-1.56M17.39 6.61l1.56-1.56"/>
+  </svg>
+  <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+    <path fill="currentColor"
+      d="M19.5 13.2A7.8 7.8 0 0 1 10.8 4.5 8.2 8.2 0 1 0 19.5 13.2Z"/>
+  </svg>
 </button>
 <script src="presentation.js"></script>
 </body>
