@@ -195,15 +195,20 @@
 
   // Видео на слайде должно начинаться с первого кадра в тот момент, когда
   // спикер до него дошёл, а не доигрывать начатое в фоне.
+  // muted в HTML нет: звук нужен в зале. Браузер разрешает play() со звуком
+  // после жеста (кликер / клавиша) — к слайду 7 жест уже был.
   function syncVideo() {
     slides.forEach(function (slide, i) {
       [].forEach.call(slide.querySelectorAll('video'), function (v) {
         if (i === index) {
+          v.muted = false;
+          v.volume = 1;
           if (v.paused) { try { v.currentTime = 0; } catch (e) {} }
           var p = v.play();
           if (p && p.catch) p.catch(function () {});
         } else {
           v.pause();
+          v.muted = true;
         }
       });
     });
