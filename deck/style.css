@@ -51,14 +51,17 @@ html, body {
 #viewport {
   position: fixed;
   inset: 0;
-  display: grid;
-  place-items: center;
+  overflow: hidden;
 }
 
 /* Сцена фиксированного размера, вписывается в окно масштабированием.
-   Это даёт пиксельную точность вёрстки и совпадение с PDF-выгрузкой. */
+   position+translate — обязательны: один transform: scale() оставляет
+   layout-коробку 1920×1080, и на ноутбуке слайд визуально «торчит»
+   за край (лечится зумом браузера ~75%). */
 .stage {
-  position: relative;
+  position: absolute;
+  left: 50%;
+  top: 50%;
   width: 1920px;
   height: 1080px;
   flex: none;
@@ -66,6 +69,8 @@ html, body {
   background: var(--bg);
   color: var(--light);
   display: none;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
 }
 .stage.current { display: block; }
 

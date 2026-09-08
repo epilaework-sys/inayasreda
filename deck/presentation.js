@@ -156,14 +156,38 @@
 
   /* ---------- Обычный режим показа ---------------------------------------- */
 
+  function viewportSize() {
+    // visualViewport учитывает UI браузера и pinch-zoom; inner* — запасной путь.
+    var vv = window.visualViewport;
+    return {
+      w: Math.max(320, (vv && vv.width) || window.innerWidth || document.documentElement.clientWidth),
+      h: Math.max(240, (vv && vv.height) || window.innerHeight || document.documentElement.clientHeight)
+    };
+  }
+
   function fit() {
-    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    var size = viewportSize();
+    // 0.995 — зазор в полпроцента: без него на дробных CSS-пикселях
+    // правый/нижний край иногда срезается на 1px и слайд кажется «больше окна».
+    var s = Math.min(size.w / 1920, size.h / 1080) * 0.995;
+    if (!isFinite(s) || s <= 0) s = 1;
+    var tx = 'translate(-50%, -50%) scale(' + s + ')';
     slides.forEach(function (slide) {
-      slide.style.transform = 'scale(' + s + ')';
+      slide.style.transform = tx;
     });
   }
+
   window.addEventListener('resize', fit);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', fit);
+    window.visualViewport.addEventListener('scroll', fit);
+  }
+  window.addEventListener('orientationchange', fit);
+  // Второй проход после layout/шрифтов: на первом кадре innerHeight
+  // иногда ещё без учёта панелей браузера.
   fit();
+  requestAnimationFrame(fit);
+  window.addEventListener('load', fit);
 
   var index = 0;
   var step = 0;
