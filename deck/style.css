@@ -253,6 +253,27 @@ html, body {
 /* Слайд 4: спикер слева. Текст на пустом паркете, не на голове и не на зале. */
 .s04 .display { margin-left: 24%; }
 
+/* Локальная подложка под набор, когда шторки bleed не хватает
+   (белый экран / светлое пятно в кадре). */
+.text-plate {
+  display: inline-block;
+  padding: 40px 48px 44px;
+  margin: 0 -16px;
+  background: rgba(20, 20, 19, 0.58);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* Набор только в нижней трети — не залезает на светлый верх афиши. */
+.pad.low {
+  top: 58%;
+}
+
+/* Набор в верхней зоне — люди / лица остаются свободны внизу. */
+.pad.high {
+  bottom: 48%;
+}
+
 /* --------------------------------------------------------------------------
    Архетип D — история героини.
    Вертикальное фото на всю высоту, текст рядом. Сторона чередуется.
@@ -387,6 +408,51 @@ html, body {
 .stack .tile:nth-child(5) { --rot: -3deg; --dx: 4px;   --dy: -8px;  z-index: 5; }
 .stack .tile:nth-child(6) { --rot: 2deg;  --dx: -22px; --dy: -2px;  z-index: 6; }
 
+/* Квадратные карточки с текстом (Random Coffee и т.п.): портрет 570×760
+   срезал края. Рамка 1:1 + contain — весь набор читается. */
+.stack.sq { width: 760px; height: 760px; }
+.stack.sq .tile {
+  width: 600px;
+  height: 600px;
+  margin: -300px 0 0 -300px;
+  background: var(--ink);
+}
+.stack.sq .tile img { object-fit: contain; }
+.stack.sq .tile:nth-child(1) { --rot: -3deg; --dx: -18px; --dy: 8px; }
+.stack.sq .tile:nth-child(2) { --rot: 3deg;  --dx: 20px;  --dy: -8px; }
+
+/* Кадры целиком, без обрезки (разный aspect у фото из Docs). */
+.stack.fit .tile { background: var(--ink); }
+.stack.fit .tile img { object-fit: contain; }
+
+.bleed.fit {
+  background: var(--bg);
+}
+.bleed.fit img {
+  object-fit: contain;
+  object-position: center center;
+}
+
+.split .shot.fit { background: var(--ink); }
+.split .shot.fit img { object-fit: contain; }
+
+/* Вертикальный постер (сторис/афиша) рядом с текстом — целиком. */
+.poster {
+  flex: none;
+  width: 520px;
+  height: 780px;
+  background: var(--ink);
+  border: 12px solid var(--light);
+  box-shadow: 0 26px 64px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+.poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
 /* Своя пара состояний для шага: базовый .step сбрасывает transform в none
    и вместе с ним стёр бы наклон кадра. Здесь наклон сохраняется, а кадр
    «кладётся» сверху — приходит чуть крупнее и выше своего места. */
@@ -518,6 +584,20 @@ body.printing .videoslot video { display: none; }
   min-height: 208px;
 }
 .eco .node .star { width: 22px; height: 22px; margin: 0; }
+
+/* Четыре желания в ряд — длинный текст, звезда сверху */
+.eco.desires .node {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 22px;
+  font-size: 32px;
+  line-height: 1.28;
+  font-weight: 400;
+  min-height: 320px;
+  padding: 32px 30px;
+}
+.eco.desires .node .star { width: 28px; height: 28px; flex: none; }
 
 /* Крупные цифры */
 .figures { display: flex; gap: 100px; }
